@@ -69,7 +69,7 @@ class PostController implements ControllerProviderInterface
      */
     public function getPostById(Application $app, $post_id)
     {
-        $post = $app["repositories"]("Nurse")->findOneById($post_id);
+        $post = $app["repositories"]("Post")->findOneById($post_id);
 
         return $app->json($post, 200);
     }
