@@ -33,8 +33,8 @@ class UserController implements ControllerProviderInterface
                     ->before(new JWTTokenCheck());
 
         // On crée un utilisateur
-        $controllers->post('/user', [$this, 'createUser'])
-                    ->before(new JWTTokenCheck());
+        $controllers->post('/user', [$this, 'createUser']);
+//                    ->before(new JWTTokenCheck());
 
         return $controllers;
     }

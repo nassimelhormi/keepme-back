@@ -3,6 +3,7 @@
 namespace KeepMe\Entities;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 use KeepMe\Utils\Doctrine\AutoIncrementId;
 use Doctrine\Common\Collections\ArrayCollection;
 
@@ -49,7 +50,8 @@ class User implements \JsonSerializable
      */
     protected $children;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->children = new ArrayCollection();
     }
 
@@ -86,7 +88,7 @@ class User implements \JsonSerializable
         return $this->lastname;
     }
 
-        /**
+    /**
      * Gets the value of email.
      *
      * @return string
@@ -132,9 +134,9 @@ class User implements \JsonSerializable
         $children = array_map(
             function ($child) {
                 return [
-                    "id"          => $child->getId(),
-                    "firstname"   => $child->getFirstname(),
-                    "birthdate"   => $child->getBirthdate('Y-m-d')
+                    "id"        => $child->getId(),
+                    "firstname" => $child->getFirstname(),
+                    "birthdate" => $child->getBirthdate('Y-m-d')
                 ];
             },
             $user_children
@@ -200,7 +202,7 @@ class User implements \JsonSerializable
 
         return $this;
     }
-    
+
     /**
      * Sets the value of longitude.
      *
@@ -228,7 +230,6 @@ class User implements \JsonSerializable
 
         return $this;
     }
-
 
 
     /* ------------ UTILS ------------ */

@@ -38,18 +38,19 @@ class HomeController implements ControllerProviderInterface
         return $app->json("home", 200);
     }
 
-    public function login(Application $app, Request $req) 
+    public function login(Application $app, Request $req)
     {
-        $email    = $req->request->get('email', null);
-        $password = sha1($req->request->get('password', null));
+        $email = $req->get('email') ?? null;
+        $password = $req->get('password') ?? null;
 
-        if (null === $email || null === $password) {
+        if (null === $email || null === $password)
             return $app->abort(400, "Empty email or password");
-        }
 
-        $user = $app["repositories"]("User")->findOneBy(["email" => $email,"password" => $password]);
+        $password = sha1($password);
 
-        $token = $app['jwt_auth']->generateToken($user->toArray());
+        if (($user = $app["orm.em"]->getRepository(User::class)->findOneBy(["email" => $email, "password" => $password])) === null ||
+            ($token = $app['jwt_auth']->generateToken($user->toArray())) === null)
+            return $app->abort(401, "Authentication failed");
 
         return $app->json(['token' => $token], 200);
     }

@@ -28,19 +28,19 @@ class PostController implements ControllerProviderInterface
 
         // On récupère toutes les posts
         $controllers->get('/posts', [$this, 'getAllPosts'])
-                    ->before(new JWTTokenCheck());
+            ->before(new JWTTokenCheck());
 
         // On récupère une nurse selon son id
         $controllers->get('/post/{post_id}', [$this, 'getPostById'])
-                    ->before(new JWTTokenCheck());
+            ->before(new JWTTokenCheck());
 
         // On crée un utilisateur
-        $controllers->post('/post', [$this, 'createPost'])
-                    ->before(new JWTTokenCheck());
+        $controllers->post('/post', [$this, 'createPost']);
+//                    ->before(new JWTTokenCheck());
 
         // On attribue un post à une nurse
         $controllers->put('/post/{post_id}/validate', [$this, 'validatePost'])
-                    ->before(new JWTTokenCheck());
+            ->before(new JWTTokenCheck());
 
         return $controllers;
     }
@@ -48,7 +48,7 @@ class PostController implements ControllerProviderInterface
     /**
      * Récupère toutes les posts
      *
-     * @param Application $app      Silex Application
+     * @param Application $app Silex Application
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
@@ -62,8 +62,8 @@ class PostController implements ControllerProviderInterface
     /**
      * Récupère un post selon son id
      *
-     * @param Application $app       Silex Application
-     * @param integer     $post_id  id de la nurse
+     * @param Application $app Silex Application
+     * @param integer $post_id id de la nurse
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
@@ -75,29 +75,31 @@ class PostController implements ControllerProviderInterface
     }
 
     /**
-    * Création d'un post
-    *
-    * @param Application $app       Silex Application
-    * @param Request     $req       Request
-    * @param integer     $user_id   id du user
-    *
-    * @return \Symfony\Component\HttpFoundation\JsonResponse
-    * Exemple de body :
-    * {
-    *  	"title": "le titre frero",
-    *   "description": "ladescription frero",
-    *   "longitude": "2.2",
-    *   "latitude": "4.55555",
-    *   "start": "2000-01-01",
-    *   "end": "2000-01-01",
-    *   "nb_children": 2,
-    *   "hourly_rate": 9
-    * }
-    */
-   public function createPost(Application $app, Request $req)
-   {
-        $token      = substr($req->headers->get('authorization'), 7);
-        $token_user = $app['jwt_auth']->getPayload($token)['sub'];
+     * Création d'un post
+     *
+     * @param Application $app Silex Application
+     * @param Request $req Request
+     * @param integer $user_id id du user
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * Exemple de body :
+     * {
+     *    "title": "le titre frero",
+     *   "description": "ladescription frero",
+     *   "longitude": "2.2",
+     *   "latitude": "4.55555",
+     *   "start": "2000-01-01",
+     *   "end": "2000-01-01",
+     *   "nb_children": 2,
+     *   "hourly_rate": 9
+     * }
+     */
+    public function createPost(Application $app, Request $req)
+    {
+
+//        if (($token = $req->headers->get('authorization')) === null ||
+//            ($token_user = $app['jwt_auth']->getPayload(substr($token, 7))['sub']) === null)
+//            return $app->abort(401);
 
         $user = $app["repositories"]("User")->findOneById(10);
         if (null === $user) {
@@ -114,17 +116,17 @@ class PostController implements ControllerProviderInterface
 
         $app["orm.em"]->persist($post);
         $app["orm.em"]->flush();
-        
-        return $app->json($post, 200);
-   }
 
-   public function validatePost(Application $app, Request $req, $post_id)
-   {
-       
-        $token      = substr($req->headers->get('authorization'), 7);
+        return $app->json($post, 200);
+    }
+
+    public function validatePost(Application $app, Request $req, $post_id)
+    {
+
+        $token = substr($req->headers->get('authorization'), 7);
         $token_user = $app['jwt_auth']->getPayload($token)['sub'];
-        $nurse      = $app["repositories"]("Nurse")->findOneBy(array("user" => $token_user->id));
-        
+        $nurse = $app["repositories"]("Nurse")->findOneBy(array("user" => $token_user->id));
+
         if (null === $nurse || empty($nurse)) {
             return $app->abort(403, "Forbidden");
         }
@@ -140,5 +142,5 @@ class PostController implements ControllerProviderInterface
 
         return $app->json($post, 200);
 
-   }
+    }
 }

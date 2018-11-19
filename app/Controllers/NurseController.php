@@ -28,19 +28,19 @@ class NurseController implements ControllerProviderInterface
 
         // On récupère toutes les nurses
         $controllers->get('/nurses', [$this, 'getAllNurses'])
-                    ->before(new JWTTokenCheck());
+            ->before(new JWTTokenCheck());
 
         // On récupère une nurse selon son id
         $controllers->get('/nurse/{nurse_id}', [$this, 'getNurseById'])
-                    ->before(new JWTTokenCheck());
+            ->before(new JWTTokenCheck());
 
         // On crée un utilisateur
-        $controllers->post('/nurse', [$this, 'createNurse'])
-                    ->before(new JWTTokenCheck()); // WORK IN PROGRESS
+        $controllers->post('/nurse', [$this, 'createNurse']);
+//                    ->before(new JWTTokenCheck()); // WORK IN PROGRESS
 
         // On valide un utilisateur
         $controllers->put('/nurse/{nurse_id}', [$this, 'validateNurse'])
-                    ->before(new JWTTokenCheck());
+            ->before(new JWTTokenCheck());
 
         return $controllers;
     }
@@ -48,7 +48,7 @@ class NurseController implements ControllerProviderInterface
     /**
      * Récupère toutes les nurses
      *
-     * @param Application $app      Silex Application
+     * @param Application $app Silex Application
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
@@ -62,8 +62,8 @@ class NurseController implements ControllerProviderInterface
     /**
      * Récupère toutes les nurses
      *
-     * @param Application $app       Silex Application
-     * @param integer     $nurse_id  id de la nurse
+     * @param Application $app Silex Application
+     * @param integer $nurse_id id de la nurse
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
@@ -75,17 +75,17 @@ class NurseController implements ControllerProviderInterface
     }
 
     /**
-    * Création d'une nurse
-    *
-    * @param Application $app       Silex Application
-    * @param Request     $req       Request
-    * @param integer     $user_id   id du user
-    *
-    * @return \Symfony\Component\HttpFoundation\JsonResponse
-    */
-   public function createNurse(Application $app, Request $req)
-   {
-        $token      = substr($request->headers->get('authorization'), 7);
+     * Création d'une nurse
+     *
+     * @param Application $app Silex Application
+     * @param Request $req Request
+     * @param integer $user_id id du user
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function createNurse(Application $app, Request $req)
+    {
+        /*$token = substr($req->headers->get('authorization'), 7);
         $token_user = $app['jwt_auth']->getPayload($token)['sub'];
 
         $user = $app["repositories"]("User")->findOneById($token_user->id);
@@ -104,26 +104,45 @@ class NurseController implements ControllerProviderInterface
         $app["orm.em"]->persist($nurse);
         $app["orm.em"]->flush();
 
+        return $app->json($nurse, 200);*/
+
+        $datas = $req->request->all();
+
+        $user = new User();
+
+        $user->setProperties($datas);
+        $user->setPassword(sha1($datas["password"]));
+
+        $nurse = new Nurse();
+        $nurse->setBirthdate($datas["birthDate"]);
+        $nurse->setUser($user);
+        $nurse->setValidate(0);
+
+
+        $app["orm.em"]->persist($user);
+        $app["orm.em"]->persist($nurse);
+        $app["orm.em"]->flush();
+
+        return $app->json(["toto"], 200);
+    }
+
+    /**
+     * Validation d'une nurse
+     *
+     * @param Application $app Silex Application
+     * @param integer $nurse_id id de la nurse
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function validateNurse(Application $app, $nurse_id)
+    {
+        $nurse = $app["repositories"]("Nurse")->findOneById($nurse_id);
+
+        $nurse->setValidate(1);
+
+        $app["orm.em"]->persist($nurse);
+        $app["orm.em"]->flush();
+
         return $app->json($nurse, 200);
-   }
-
-   /**
-   * Validation d'une nurse
-   *
-   * @param Application $app       Silex Application
-   * @param integer     $nurse_id  id de la nurse
-   *
-   * @return \Symfony\Component\HttpFoundation\JsonResponse
-   */
-  public function validateNurse(Application $app, $nurse_id)
-  {
-      $nurse = $app["repositories"]("Nurse")->findOneById($nurse_id);
-
-      $nurse->setValidate(1);
-
-      $app["orm.em"]->persist($nurse);
-      $app["orm.em"]->flush();
-
-      return $app->json($nurse, 200);
-  }
+    }
 }

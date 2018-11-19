@@ -20,6 +20,7 @@ use Saxulum\DoctrineOrmManagerRegistry\Provider\DoctrineOrmManagerRegistryProvid
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\Dotenv\Dotenv;
 
 
 /**
@@ -27,16 +28,20 @@ use Symfony\Component\HttpFoundation\ParameterBag;
  */
 class Config implements ServiceProviderInterface
 {
-    private $env = "production";
+    private $env = "dev";
+
+//    private $env = "production";
 
     public function __construct($env = null)
     {
-        if (null !== $env) {
+        $dotenv = new Dotenv();
+        $dotenv->load(__DIR__ . '/../.env.dev');
+        /*if (null !== $env) {
             $this->env = $env;
             if (true === file_exists(__DIR__ . "/Env/{$this->env}.php")) {
                 require_once __DIR__ . "/Env/{$this->env}.php";
             }
-        }
+        }*/
     }
 
     public function authBeforeFunction(Request $req, Application $app)
@@ -74,31 +79,33 @@ class Config implements ServiceProviderInterface
         $this->registerEnvironmentParams($app);
         $this->registerServiceProviders($app);
         $this->registerRoutes($app);
+        $app->register(new \Silex\Provider\MonologServiceProvider(), array(
+            'monolog.logfile' => __DIR__ . '/../storage/log/development.log',
+            'monolog.level'   => \Psr\Log\LogLevel::DEBUG
+        ));
+
         //$app->after($app["cors"]);
 
         $app->after(function (Request $request, Response $response) {
             $response = new Response();
             $response->headers->set('Access-Control-Allow-Origin', '*');
             $response->headers->set('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, PATCH, OPTIONS');
-            $response->headers->set('Access-Control-Allow-Headers', 'origin, content-type, accept');
+            $response->headers->set('Access-Control-Allow-Headers', 'Origin, Content-Type, Accept, Authorization');
         });
 
-        
 
         // On peut faire $req->request->all() ou $req->request->get('mavariable')
         // au lieu de faire un json_decode($req->getContent(), true)
         $app->before(function (Request $request) use ($app) {
             // on ne s'interese qu'aux requêtes de type "application/json"
-            if (0 !== strpos($request->headers->get('Content-Type'), 'application/json')) {
+//            if (0 !== strpos($request->headers->get('Content-Type'), 'application/json')) {
+//                return;
+//            }
+
+            if (($data = json_decode($request->getContent(), true)) !== null)
+                $request->request->replace(is_array($data) ? $data : array());
+            else
                 return;
-            }
-
-            $params = json_decode($request->getContent(), true);
-            if (false === is_array($params)) {
-                $app->abort(400, "Invalid JSON data");
-            }
-
-            $request->request->replace($params);
         });
 
         $app["dispatcher"]->addSubscriber(new Utils\Silex\EventSubscriber\ExceptionListener($app));
@@ -115,14 +122,14 @@ class Config implements ServiceProviderInterface
     {
         include "Utils/Silex/Middlewares.php";
 
-        $app['application_name']      = 'keepme-api';
-        $app['application_env']       = $this->env;
-        $app['application_path']      = realpath(__DIR__ . "/../");
+        $app['application_name'] = 'keepme-api';
+        $app['application_env'] = $this->env;
+        $app['application_path'] = realpath(__DIR__ . "/../");
         $app['application_namespace'] = __NAMESPACE__;
 
-        $app['db_host']     = getenv("KEEPME_DATABASE_HOST");
-        $app['db_name']     = getenv("KEEPME_DATABASE_NAME");
-        $app['db_user']     = getenv("KEEPME_DATABASE_USER");
+        $app['db_host'] = getenv("KEEPME_DATABASE_HOST");
+        $app['db_name'] = getenv("KEEPME_DATABASE_NAME");
+        $app['db_user'] = getenv("KEEPME_DATABASE_USER");
         $app['db_password'] = getenv("KEEPME_DATABASE_PWD");
     }
 
@@ -145,21 +152,24 @@ class Config implements ServiceProviderInterface
         $app['db.options'] = array(
             'driver'   => 'pdo_mysql',
             'charset'  => 'utf8',
+            'port'     => 3306,
             'host'     => $app['db_host'],
             'dbname'   => $app['db_name'],
             'user'     => $app['db_user'],
             'password' => $app['db_password'],
         );
+        $app['db']->connect();
 
         // Doctrine (orm)
         $app['orm.proxies_dir'] = $app['application_path'] . '/cache/doctrine/proxies';
         $app['orm.default_cache'] = 'array';
         $app['orm.em.options'] = array(
-            'mappings' => array(
+            'auto_mapping' => true,
+            'mappings'     => array(
                 array(
-                    'type' => 'annotation',
-                    'path' => $app['application_path'] . '/app',
-                    'namespace' => "{$app['application_namespace']}\\Entities",
+                    'type'      => 'annotation',
+                    'path'      => $app['application_path'] . '/app/Entities',
+                    'namespace' => $app['application_namespace'] . "\\Entities",
                 ),
             ),
         );
@@ -168,10 +178,9 @@ class Config implements ServiceProviderInterface
         // do $app["repositories"]("MyClass") instead of $app["orm.em"]->getRepository("MyClass")
         $app["repositories"] = $app->protect(
             function ($repository_name) use ($app) {
-                $class_name = "\\{$app['orm.em.options']['mappings'][0]['namespace']}\\". $repository_name;
-                if (class_exists($class_name)) {
+                $class_name = $app['orm.em.options']['mappings'][0]['namespace'] . "\\" . $repository_name;
+                if (class_exists($class_name))
                     return $app['orm.em']->getRepository($class_name);
-                }
                 return null;
             }
         );
@@ -192,7 +201,7 @@ class Config implements ServiceProviderInterface
         // Recherche tous les controllers pour les loader dans $app
         foreach (glob(__DIR__ . "/Controllers/*.php") as $controller_name) {
             $controller_name = pathinfo($controller_name)["filename"];
-            $class_name      = "\\KeepMe\\Controllers\\{$controller_name}";
+            $class_name = "\\KeepMe\\Controllers\\{$controller_name}";
             if (class_exists($class_name)
                 && in_array("Silex\Api\ControllerProviderInterface", class_implements($class_name))
             ) {
