@@ -14,6 +14,7 @@ Use KeepMe\Entities\User;
 
 use Ofat\SilexJWT\JWTAuth;
 use Ofat\SilexJWT\Middleware\JWTTokenCheck;
+use KeepMe\Utils\CreateUtils;
 
 class UserController implements ControllerProviderInterface
 {
@@ -39,7 +40,6 @@ class UserController implements ControllerProviderInterface
 
         // On crée un utilisateur
         $controllers->post('/user', [$this, 'createUser']);
-//                    ->before(new JWTTokenCheck());
 
         return $controllers;
     }
@@ -111,6 +111,8 @@ class UserController implements ControllerProviderInterface
     public function createUser(Application $app, Request $req)
     {
         $datas = $req->request->all();
+
+        CreateUtils::checkCreateFields($app, $datas);
 
         $user = new User();
 
