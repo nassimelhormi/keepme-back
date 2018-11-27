@@ -46,6 +46,3 @@
 */Entity/*~
 
 /.idea/
-
-**.env.dev
-/storage/
