@@ -36,6 +36,7 @@ class Config implements ServiceProviderInterface
     {
         $dotenv = new Dotenv();
         $dotenv->load(__DIR__ . '/../.env.dev');
+        $dotenv->load(__DIR__ . '/../.mail.dev');
         /*if (null !== $env) {
             $this->env = $env;
             if (true === file_exists(__DIR__ . "/Env/{$this->env}.php")) {
@@ -123,6 +124,8 @@ class Config implements ServiceProviderInterface
         include "Utils/Silex/Middlewares.php";
 
         $app['application_name'] = 'keepme-api';
+        $app['application_url'] = getenv('APP_URL');
+        $app['app_front'] = getenv('APP_FRONT');
         $app['application_env'] = $this->env;
         $app['application_path'] = realpath(__DIR__ . "/../");
         $app['application_namespace'] = __NAMESPACE__;
@@ -131,6 +134,13 @@ class Config implements ServiceProviderInterface
         $app['db_name'] = getenv("KEEPME_DATABASE_NAME");
         $app['db_user'] = getenv("KEEPME_DATABASE_USER");
         $app['db_password'] = getenv("KEEPME_DATABASE_PWD");
+
+        $app['mail_host'] = getenv("MAIL_HOST");
+        $app['mail_port'] = getenv("MAIL_PORT");
+        $app['mail_username'] = getenv("MAIL_USERNAME");
+        $app['mail_password'] = getenv("MAIL_PASSWORD");
+        $app['mail_encryption'] = getenv("MAIL_ENCRYPTION");
+        $app['mail_auth'] = getenv("MAIL_AUTH");
     }
 
     /**
@@ -188,6 +198,16 @@ class Config implements ServiceProviderInterface
         $app->register(new ConsoleProvider());
         $app->register(new DoctrineOrmManagerRegistryProvider());
         $app->register(new CorsServiceProvider());
+
+        $app->register(new \Silex\Provider\SwiftmailerServiceProvider());
+        $app['swiftmailer.options'] = array(
+            'host'       => $app['mail_host'],
+            'port'       => $app['mail_port'],
+            'username'   => $app['mail_username'],
+            'password'   => $app['mail_password'],
+            'encryption' => $app['mail_encryption'],
+            'auth_mode'  => $app['mail_auth'],
+        );
     }
 
     /**

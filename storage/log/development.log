@@ -1,6 +1,0 @@
-[2018-11-16 11:11:13] app.INFO: Matched route "{route}". {"route":"OPTIONS_anything","route_parameters":{"_controller":"[object] (Closure: {})","anything":"login","_route":"OPTIONS_anything"},"request_uri":"http://localhost:8080/login","method":"OPTIONS"} []
-[2018-11-16 11:11:13] app.DEBUG: > OPTIONS /login [] []
-[2018-11-16 11:11:13] app.DEBUG: < 204 [] []
-[2018-11-16 11:11:13] app.INFO: Matched route "{route}". {"route":"POST_login","route_parameters":{"_controller":["[object] (KeepMe\\Controllers\\HomeController: {})","login"],"_route":"POST_login"},"request_uri":"http://localhost:8080/login","method":"POST"} []
-[2018-11-16 11:11:13] app.DEBUG: > POST /login [] []
-[2018-11-16 11:11:13] app.DEBUG: < 200 [] []

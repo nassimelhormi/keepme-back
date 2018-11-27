@@ -46,6 +46,11 @@ class User implements \JsonSerializable
     protected $latitude;
 
     /**
+     * @Column(type="boolean", name="is_active", length=1, nullable=false)
+     */
+    protected $is_active;
+
+    /**
      * @OneToMany(targetEntity="Children", mappedBy="user")
      */
     protected $children;
@@ -231,6 +236,22 @@ class User implements \JsonSerializable
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getIsActive()
+    {
+        return $this->is_active;
+    }
+
+    /**
+     * @param mixed $is_active
+     */
+    public function setIsActive($is_active)
+    {
+        $this->is_active = $is_active;
+    }
+
 
     /* ------------ UTILS ------------ */
 
@@ -242,7 +263,8 @@ class User implements \JsonSerializable
             "lastname"  => $this->getLastname(),
             "email"     => $this->getEmail(),
             "longitude" => $this->getLongitude(),
-            "latitude"  => $this->getLatitude()
+            "latitude"  => $this->getLatitude(),
+            "active"    => $this->getIsActive(),
         ];
     }
 

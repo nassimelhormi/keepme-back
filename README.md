@@ -17,11 +17,13 @@ composer install
 
 Pour lancer le serveur php en local :
 ```
-php -S localhost:8080 -t public public/index.php
+composer start >&/dev/null &
 ```
+<!-- php -S localhost:7777 -t public public/index.php -->
 
 
 On accède via :
 ```
-http://localhost:8080/
+http://localhost:7777/
 ```
+

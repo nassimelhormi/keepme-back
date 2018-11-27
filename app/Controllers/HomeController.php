@@ -33,14 +33,12 @@ class HomeController implements ControllerProviderInterface
 
     public function index(Application $app)
     {
-        // $token = $app['jwt_auth']->getToken();
-
         return $app->json("home", 200);
     }
 
     public function login(Application $app, Request $req)
     {
-        $email = $req->get('email') ?? null;
+        $email    = $req->get('email') ?? null;
         $password = $req->get('password') ?? null;
 
         if (null === $email || null === $password)
@@ -48,8 +46,10 @@ class HomeController implements ControllerProviderInterface
 
         $password = sha1($password);
 
-        if (($user = $app["orm.em"]->getRepository(User::class)->findOneBy(["email" => $email, "password" => $password])) === null ||
-            ($token = $app['jwt_auth']->generateToken($user->toArray())) === null)
+        $user  = $app["repositories"]("User")->findOneBy(["email" => $email, "password" => $password]);
+        $token = $app['jwt_auth']->generateToken($user->toArray());
+
+        if ($user === null || !$user->getIsActive() || $token === null)
             return $app->abort(401, "Authentication failed");
 
         return $app->json(['token' => $token], 200);
