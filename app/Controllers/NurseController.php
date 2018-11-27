@@ -94,7 +94,7 @@ class NurseController implements ControllerProviderInterface
         $user->setPassword(sha1($datas["password"]));
 
         $nurse = new Nurse();
-        $nurse->setBirthdate($datas["birthDate"]);
+        $nurse->setBirthdate($datas["birthdate"]);
         $nurse->setUser($user);
         $nurse->setValidate(0);
 
