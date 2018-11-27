@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <title>Validation du compte KeepMe</title>
+        <style type="text/css">body {
+            text-align: justify
+        }
+
+        .container, .mx-auto {
+            margin-right: auto;
+            margin-left: auto
+        }
+
+        .text-center {
+            text-align: center
+        }
+
+        hr {
+            box-sizing: content-box;
+            height: 0;
+            margin-top: 1rem;
+            border: 0;
+            border-top: 1px solid rgba(0, 0, 0, .1)
+        }
+
+        a, a:hover {
+            text-decoration: none !important
+        }
+
+        .row {
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-wrap: wrap;
+            flex-wrap: wrap;
+            margin-left: 0 !important;
+            margin-right: 0 !important
+        }
+
+        .w-50 {
+            width: 50% !important
+        }
+
+        .w-100 {
+            width: 100% !important
+        }
+
+        .mt-5, .my-5 {
+            margin-bottom: 3rem !important;
+            margin-top: 3rem !important
+        }
+
+        .small, small {
+            font-size: 80%;
+            font-weight: 400
+        }
+
+        .h5 {
+            margin-bottom: .5rem;
+            font-family: inherit;
+            font-weight: 500;
+            line-height: 1.2;
+            color: inherit;
+            font-size: 1.25rem
+        }
+
+        .font-weight-bold {
+            font-weight: 600 !important
+        }
+
+        @font-face {
+            font-family: SourceSansProRegular;
+            src: url(https://fonts.googleapis.com/css?family=Source+Sans+Pro);
+            font-weight: 400;
+            font-style: normal
+        }
+
+        @font-face {
+            font-family: SourceSansProLight;
+            src: url(https://fonts.googleapis.com/css?family=Source+Sans+Pro);
+            font-weight: 400;
+            font-style: normal
+        }
+
+        body {
+            position: relative;
+            background-color: #FFFFFF;
+            color: #222;
+            font-family: SourceSansProLight, SourceSansProRegular, sans-serif
+        }
+
+        .title {
+            text-align: center;
+            width: 100%;
+            margin-bottom: 3rem
+        }
+
+        .btn {
+            font-family: "Open Sans", sans-serif;
+            padding: 15px 30px;
+            outline: 0;
+            font-size: 15px;
+            font-weight: 600;
+            -webkit-border-radius: 2px !important;
+            -moz-border-radius: 2px !important;
+            border-radius: 2px !important;
+            color: #fff !important
+        }
+
+        .btn:hover {
+            background-color: #fff !important
+        }
+
+        .btn.orange-bg:hover, .orange-text {
+            color: #FBAC4C !important
+        }
+
+        .orange-bg {
+            background-color: #FBAC4C !important
+        }
+
+        .btn.orange-bg:hover {
+            border-color: #FBAC4C !important
+        }
+
+        .text-danger {
+            color: red;
+        }
+
+        </style>
+    </head>
+    <body>
+
+        <div class="row">
+            <div class="cw-50 mx-auto">
+                <label class="h5 font-weight-bold">Bonjour {{ firstname }},</label>
+            </div>
+        </div>
+
+        <hr class="w-50 my-5">
+
+        <div class="row">
+            <div class="w-50 mx-auto">
+                <p>Vous vous êtes récemment inscrit au service KeepMe.</p>
+                <p class="font-weight-bold">Vous devez maintenant confirmer votre inscription en cliquant sur le lien
+                    ci-dessous.</p>
+                <div class="w-100 text-center my-5">
+                    <a class="btn orange-bg text-white" href="{{ link }}" target="_blank">Confirmer la création de mon
+                        compte</a>
+                </div>
+                <!--<p class="font-weight-bold">Le lien est valable pendant <span class="text-danger">2 heures</span>.</p>-->
+                <p>Si vous n'avez pas demandé à vous inscrire merci d'ignorer ce mail ou de nous contacter.</p>
+                <p>Cordialement,</p>
+                <p>L'équipe KeepMe.</p>
+            </div>
+        </div>
+
+        <hr class="w-50 my-5">
+
+    </body>
+</html>

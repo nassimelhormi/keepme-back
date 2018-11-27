@@ -49,6 +49,7 @@ class HomeController implements ControllerProviderInterface
         $password = sha1($password);
 
         if (($user = $app["orm.em"]->getRepository(User::class)->findOneBy(["email" => $email, "password" => $password])) === null ||
+            (!$user->getIsActive()) ||
             ($token = $app['jwt_auth']->generateToken($user->toArray())) === null)
             return $app->abort(401, "Authentication failed");
 
