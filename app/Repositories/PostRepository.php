@@ -12,35 +12,5 @@ Use KeepMe\Entities\Post;
  */
 class PostRepository extends \Doctrine\ORM\EntityRepository
 {
-    public function search($longitude, $latitude, $rayon)
-    {
-        $dql =
-            "SELECT post
-            FROM KeepMe\Entities\Post post
-            WHERE MBRContains(
-                LineString (
-                    Point(
-                        :longitude + 10 / ( 111.1 / COS(RADIANS(:latitude))),
-                        :latitude + 10 / 111.1
-                    ),
-                    Point(
-                        :longitude - 10 / ( 111.1 / COS(RADIANS(:latitude))),
-                        :latitude - 10 / 111.1
-                    )
-                ),
-                :rayon
-            )
-        ";
 
-        $params = [
-            "longitude" => $longitude,
-            "latitude"  => $latitude,
-            "rayon"     => $rayon
-        ];
-
-        $query = $this->_em->createQuery($dql);
-        $query->setParameters($params);
-
-        return $query->getResult();
-    }
 }
