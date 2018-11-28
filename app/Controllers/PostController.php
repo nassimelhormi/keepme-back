@@ -97,11 +97,11 @@ class PostController implements ControllerProviderInterface
     public function createPost(Application $app, Request $req)
     {
 
-//        if (($token = $req->headers->get('authorization')) === null ||
-//            ($token_user = $app['jwt_auth']->getPayload(substr($token, 7))['sub']) === null)
-//            return $app->abort(401);
+        if (($token = $req->headers->get('authorization')) === null ||
+            ($token_user = $app['jwt_auth']->getPayload(substr($token, 7))['sub']) === null)
+            return $app->abort(401);
 
-        $user = $app["repositories"]("User")->findOneById(10);
+        $user = $app["repositories"]("User")->findOneById($token_user->id);
         if (null === $user) {
             return $app->abort(404, "User not found");
         }
