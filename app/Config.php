@@ -35,7 +35,7 @@ class Config implements ServiceProviderInterface
     public function __construct($env = null)
     {
         $dotenv = new Dotenv();
-        $dotenv->load(__DIR__ . '/../.env.dev');
+        $dotenv->load(__DIR__ . '/../.env.dev', __DIR__ . '/../.mail.dev');
         /*if (null !== $env) {
             $this->env = $env;
             if (true === file_exists(__DIR__ . "/Env/{$this->env}.php")) {
