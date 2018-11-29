@@ -14,6 +14,7 @@ Use KeepMe\Entities\User;
 
 use Ofat\SilexJWT\JWTAuth;
 use Ofat\SilexJWT\Middleware\JWTTokenCheck;
+use KeepMe\Utils\CreateUtils;
 
 class UserController implements ControllerProviderInterface
 {
@@ -39,7 +40,6 @@ class UserController implements ControllerProviderInterface
 
         // On crée un utilisateur
         $controllers->post('/user', [$this, 'createUser']);
-//                    ->before(new JWTTokenCheck());
 
         return $controllers;
     }
@@ -54,9 +54,6 @@ class UserController implements ControllerProviderInterface
      */
     public function getAllUsers(Application $app, Request $request)
     {
-        $token = substr($request->headers->get('authorization'), 7);
-        $test = $app['jwt_auth']->getPayload($token);
-
         $all_users = $app["repositories"]("User")->findAll();
 
         return $app->json($all_users, 200);
@@ -79,8 +76,11 @@ class UserController implements ControllerProviderInterface
 
     public function validateAccount(Application $app, $email)
     {
-        if (($user = $app["repositories"]("User")->findOneBy(["email" => base64_decode($email)])) === null)
-            $app->abort(404);
+        $user = $app["repositories"]("User")->findOneBy(["email" => base64_decode($email)]);
+        
+        if ($user === null)
+            return $app->abort(404, "Not found");
+
         $user->setIsActive(true);
         $app["orm.em"]->persist($user);
         $app["orm.em"]->flush();
@@ -111,6 +111,8 @@ class UserController implements ControllerProviderInterface
     public function createUser(Application $app, Request $req)
     {
         $datas = $req->request->all();
+
+        CreateUtils::checkCreateFields($app, $datas);
 
         $user = new User();
 

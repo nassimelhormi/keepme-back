@@ -12,4 +12,5 @@ Use KeepMe\Entities\Post;
  */
 class PostRepository extends \Doctrine\ORM\EntityRepository
 {
+
 }

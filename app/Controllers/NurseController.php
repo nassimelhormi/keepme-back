@@ -14,6 +14,7 @@ Use KeepMe\Entities\User;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use KeepMe\Utils\CreateUtils;
 
 
 class NurseController implements ControllerProviderInterface
@@ -36,7 +37,6 @@ class NurseController implements ControllerProviderInterface
 
         // On crée un utilisateur
         $controllers->post('/nurse', [$this, 'createNurse']);
-//                    ->before(new JWTTokenCheck()); // WORK IN PROGRESS
 
         // On valide un utilisateur
         $controllers->put('/nurse/{nurse_id}', [$this, 'validateNurse'])
@@ -85,31 +85,11 @@ class NurseController implements ControllerProviderInterface
      */
     public function createNurse(Application $app, Request $req)
     {
-        /*$token = substr($req->headers->get('authorization'), 7);
-        $token_user = $app['jwt_auth']->getPayload($token)['sub'];
-
-        $user = $app["repositories"]("User")->findOneById($token_user->id);
-        if (null === $user) {
-            return $app->abort(404, "User not found");
-        }
-
         $datas = $req->request->all();
 
-        $nurse = new Nurse();
-        $nurse->setBirthdate($datas["birthdate"]);
-        $nurse->setUser($user);
-        $nurse->setValidate(0);
-
-
-        $app["orm.em"]->persist($nurse);
-        $app["orm.em"]->flush();
-
-        return $app->json($nurse, 200);*/
-
-        $datas = $req->request->all();
+        CreateUtils::checkCreateFields($app, $datas, true);
 
         $user = new User();
-
         $user->setProperties($datas);
         $user->setPassword(sha1($datas["password"]));
         $user->setLatitude($datas["lat"]);
@@ -117,7 +97,7 @@ class NurseController implements ControllerProviderInterface
         $user->setIsActive(true);
 
         $nurse = new Nurse();
-        $nurse->setBirthdate($datas["birthDate"]);
+        $nurse->setBirthdate($datas["birthdate"]);
         $nurse->setUser($user);
         $nurse->setValidate(0);
 

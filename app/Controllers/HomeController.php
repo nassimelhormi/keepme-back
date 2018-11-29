@@ -34,14 +34,12 @@ class HomeController implements ControllerProviderInterface
 
     public function index(Application $app)
     {
-        // $token = $app['jwt_auth']->getToken();
-
         return $app->json("home", 200);
     }
 
     public function login(Application $app, Request $req)
     {
-        $email = $req->get('email') ?? null;
+        $email    = $req->get('email') ?? null;
         $password = $req->get('password') ?? null;
 
         if (null === $email || null === $password)
