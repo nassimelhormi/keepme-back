@@ -112,18 +112,32 @@ class NurseController implements ControllerProviderInterface
 
         $user->setProperties($datas);
         $user->setPassword(sha1($datas["password"]));
+        $user->setLatitude($datas["lat"]);
+        $user->setLongitude($datas["lng"]);
+        $user->setIsActive(true);
 
         $nurse = new Nurse();
         $nurse->setBirthdate($datas["birthDate"]);
         $nurse->setUser($user);
         $nurse->setValidate(0);
 
-
         $app["orm.em"]->persist($user);
         $app["orm.em"]->persist($nurse);
         $app["orm.em"]->flush();
 
-        return $app->json(["toto"], 200);
+        $body = file_get_contents($app['application_path'] . "/resources/views/emails/validate-account.html");
+        $body = str_replace("{{ firstname }}", $user->getFirstname() . " " . $user->getLastname(), $body);
+        $body = str_replace("{{ link }}", $app['application_url'] . "user/validate/" . base64_encode($user->getEmail()), $body);
+
+        $message = new Swift_Message();
+        $message->setSubject('Inscription keepme')
+            ->setFrom(array($app['mail_username']))
+            ->setTo(array($user->getEmail()))
+            ->setBody($body, 'text/html');
+
+        $app['mailer']->send($message);
+
+        return $app->json($user, 200);
     }
 
     /**

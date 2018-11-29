@@ -116,6 +116,9 @@ class UserController implements ControllerProviderInterface
 
         $user->setProperties($datas);
         $user->setPassword(sha1($datas["password"]));
+        $user->setLatitude($datas["lat"]);
+        $user->setLongitude($datas["lng"]);
+        $user->setIsActive(true);
         $app["orm.em"]->persist($user);
         $app["orm.em"]->flush();
 
