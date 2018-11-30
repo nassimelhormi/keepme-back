@@ -32,8 +32,20 @@ class UserTest extends PHPUnit_Framework_TestCase
         $controller = new KeepMe\Controllers\UserController;
 
         $result = (array) (json_decode($controller->getUserById($app, 1)->getContent()));
+
         $this->assertArrayHasKey('id', $result);
+        $this->assertArrayHasKey('firstname', $result);
+        $this->assertArrayHasKey('lastname', $result);
+        $this->assertArrayHasKey('email', $result);
+        $this->assertArrayHasKey('longitude', $result);
+        $this->assertArrayHasKey('latitude', $result);
 
         $this->assertEquals($result["id"], 1);
+        $this->assertEquals($result["firstname"], 'Yanis');
+        $this->assertEquals($result["lastname"], 'AYAD');
+        $this->assertEquals($result["email"], 'ayad_y@etna-alternance.net');
+        $this->assertEquals($result["longitude"], 2.5333);
+        $this->assertEquals($result["latitude"], 48.9667);
+
     }
 }
